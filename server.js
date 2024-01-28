@@ -14,7 +14,7 @@ const port = 3000;
 // MongoDB Connection
 async function connectToMongoDB() {
   try {
-    const propertiesPath = path.resolve(__dirname, 'conf/db.properties');
+    const propertiesPath = path.resolve(__dirname, 'db.properties');
     const properties = propertiesReader(propertiesPath);
     
     const dbPrefix = properties.get('db.prefix'); // e.g., "mongodb+srv://"
@@ -30,7 +30,7 @@ async function connectToMongoDB() {
       useNewUrlParser: true,
       useUnifiedTopology: true,
       ssl: true,
-      tlsInsecure: true // Remove this or set to false in production
+      tlsInsecure: false // Remove this or set to false in production
     });
 
     await client.connect();
