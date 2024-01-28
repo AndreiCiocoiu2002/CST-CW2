@@ -17,20 +17,20 @@ async function connectToMongoDB() {
     const propertiesPath = path.resolve(__dirname, 'conf/db.properties');
     const properties = propertiesReader(propertiesPath);
     
-    const dbPrefix = properties.get('db.prefix');
-    const dbUser = encodeURIComponent(properties.get('db.user'));
-    const dbPwd = encodeURIComponent(properties.get('db.pwd')); // Make sure to encode the password as well
-    const dbName = properties.get('db.dbName');
-    const dbUrl = properties.get('db.dbUrl');
-    const dbParams = properties.get('db.params');
-    
-    const uri = `${dbPrefix}${dbUser}:${dbPwd}@${dbUrl}${dbParams}`;
+    const dbPrefix = properties.get('db.prefix'); // e.g., "mongodb+srv://"
+    const dbUser = encodeURIComponent(properties.get('db.user')); // e.g., "and112"
+    const dbPwd = encodeURIComponent(properties.get('db.pwd')); // e.g., "2002"
+    const dbName = properties.get('db.dbName'); // Your database name
+    const dbUrl = properties.get('db.dbUrl'); // e.g., "clustercw2.dutfc5z.mongodb.net"
+    const dbParams = properties.get('db.params'); // e.g., "?retryWrites=true&w=majority"
+
+    const uri = `${dbPrefix}${dbUser}:${dbPwd}@${dbUrl}/${dbName}${dbParams}`;
     
     const client = new MongoClient(uri, {
       useNewUrlParser: true,
       useUnifiedTopology: true,
       ssl: true,
-      tlsInsecure: true // This option bypasses certificate validation and should not be used in production
+      tlsInsecure: true // Remove this or set to false in production
     });
 
     await client.connect();
@@ -38,9 +38,10 @@ async function connectToMongoDB() {
     return client.db(dbName); // Return the database connection
   } catch (error) {
     console.error('Error connecting to MongoDB:', error);
-    throw error; // Throw the error so it can be caught by the caller
+    process.exit(1);
   }
 }
+
 
 // Logger Middleware
 app.use(morgan('dev'));
