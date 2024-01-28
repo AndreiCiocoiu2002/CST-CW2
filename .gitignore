@@ -77,7 +77,7 @@ public/
 # Vuepress build output
 .vuepress/dist
 
-# Serverless directories
+# Serverless directoriess
 .serverless/
 
 # FuseBox cache
