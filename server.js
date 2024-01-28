@@ -16,25 +16,29 @@ async function connectToMongoDB() {
   try {
     const propertiesPath = path.resolve(__dirname, 'conf/db.properties');
     const properties = propertiesReader(propertiesPath);
-
+    
     const dbPrefix = properties.get('db.prefix');
     const dbUser = encodeURIComponent(properties.get('db.user'));
-    const dbPwd = properties.get('db.pwd');
+    const dbPwd = encodeURIComponent(properties.get('db.pwd')); // Make sure to encode the password as well
     const dbName = properties.get('db.dbName');
     const dbUrl = properties.get('db.dbUrl');
     const dbParams = properties.get('db.params');
-
-    const uri = `${dbPrefix}${dbUser}:${dbPwd}${dbUrl}${dbParams}`;
-
-    const client = new MongoClient(uri);
+    
+    const uri = `${dbPrefix}${dbUser}:${dbPwd}@${dbUrl}${dbParams}`;
+    
+    const client = new MongoClient(uri, {
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
+      ssl: true,
+      tlsInsecure: true // This option bypasses certificate validation and should not be used in production
+    });
 
     await client.connect();
     console.log('Connected to MongoDB');
-
-    return client.db(dbName);
+    return client.db(dbName); // Return the database connection
   } catch (error) {
     console.error('Error connecting to MongoDB:', error);
-    throw error;
+    throw error; // Throw the error so it can be caught by the caller
   }
 }
 
